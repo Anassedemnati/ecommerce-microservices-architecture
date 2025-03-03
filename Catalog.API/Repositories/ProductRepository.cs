@@ -21,12 +21,15 @@ public class ProductRepository : IProductRepository
 
     public async Task<Guid> AddAsync(ProductDocument product)
     {
+        product.CreatedAt = DateTime.UtcNow;
+        product.UpdatedAt = DateTime.UtcNow;
         await _repository.AddAsync(product);
         return product.Id;
     }
     
     public async Task UpdateAsync(ProductDocument product)
     {
+        product.UpdatedAt = DateTime.UtcNow;
         await _repository.UpdateAsync(product);
     }
     
