@@ -1,27 +1,40 @@
 using Basket.API.Entities;
+using Basket.API.Models;
 using Basket.API.Repositories;
+using Basket.API.RestServices;
 
 namespace Basket.API.Services;
 
 public class BasketService: IBasketService
 {
     private readonly IBasketRepository _basketRepository;
-    public BasketService(IBasketRepository basketRepository)
+    private readonly IDiscountRestService _discountRestService;
+    public BasketService(IBasketRepository basketRepository, IDiscountRestService discountRestService)
     {
         _basketRepository = basketRepository ?? throw new ArgumentNullException(nameof(basketRepository));
-    }
-    public Task<ShoppingCart?> GetBasket(string? userName)
-    {
-        return _basketRepository.GetBasket(userName);
+        _discountRestService = discountRestService ?? throw new ArgumentNullException(nameof(discountRestService));
     }
 
-    public Task<ShoppingCart?> UpdateBasket(ShoppingCart basket)
+    public async Task<ShoppingCart?> GetBasket(string? userName)
     {
-        return _basketRepository.UpdateBasket(basket);
+        return await _basketRepository.GetBasket(userName);
     }
 
-    public Task DeleteBasket(string? userName)
+    public async Task<ShoppingCart?> UpdateBasket(ShoppingCart basket)
     {
-        return _basketRepository.DeleteBasket(userName);
+        foreach (var item in basket.Items)
+        {
+            CouponModel? coupon = await _discountRestService.GetDiscount(item.ProductName);
+            if (coupon is not null)
+            {
+                item.Price -= coupon.Amount;
+            }
+        }
+        return await _basketRepository.UpdateBasket(basket);
+    }
+
+    public async Task DeleteBasket(string? userName)
+    {
+        await _basketRepository.DeleteBasket(userName);
     }
 }
