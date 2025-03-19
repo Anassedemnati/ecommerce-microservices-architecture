@@ -1,6 +1,7 @@
 using Basket.API.Repositories;
 using Basket.API.RestServices;
 using Basket.API.Services;
+using Confluent.Kafka;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,17 @@ builder.Services.AddStackExchangeRedisCache(options =>
 
 builder.Services.AddScoped<IBasketService, BasketService>();
 builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+
+builder.Services.AddSingleton<IProducer<Null, string>>(sp =>
+{
+    var config = new ProducerConfig
+    {
+        BootstrapServers = builder.Configuration.GetValue<string>("EventBusSettings:KafkaUrl")
+    };
+    return new ProducerBuilder<Null, string>(config).Build();
+});
+
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

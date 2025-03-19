@@ -1,7 +1,10 @@
 using System.Net;
 using Basket.API.Entities;
+using Basket.API.Extensions;
 using Basket.API.Services;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Basket.API.Controllers;
 [Route("api/v1/[controller]")]
@@ -10,11 +13,16 @@ public class BasketController : ControllerBase
 {
     private readonly ILogger<BasketController> _logger;
     private readonly IBasketService _basketService;
+    private readonly IProducer<Null, string> _kafkaProducer;
+    private readonly string _kafkaTopic;
+
     
-    public BasketController(ILogger<BasketController> logger, IBasketService basketService)
+    public BasketController(ILogger<BasketController> logger, IBasketService basketService, IProducer<Null, string> kafkaProducer, IConfiguration configuration)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _basketService = basketService ?? throw new ArgumentNullException(nameof(basketService));
+        _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+        _kafkaTopic = configuration.GetValue<string>("EventBusSettings:KafkaTopic") ?? throw new ArgumentNullException(nameof(kafkaProducer));
     }
     [HttpGet("{userName}", Name = "GetBasket")]
     public async Task<ActionResult<ShoppingCart>> GetBasket(string? userName)
@@ -57,8 +65,14 @@ public class BasketController : ControllerBase
         }
 
         // send checkout event to Kafka
+        var basketCheckoutEvent = basketCheckout.ToBasketCheckoutEvent(basket);
         
-
+        var message = JsonConvert.SerializeObject(basketCheckoutEvent);
+        _logger.LogInformation("Publishing event to Kafka");
+        
+        await _kafkaProducer.ProduceAsync(_kafkaTopic, new Message<Null, string> { Value = message });
+        _logger.LogInformation("Event published to Kafka");
+        
         // remove the basket
         await _basketService.DeleteBasket(basket.UserName);
 

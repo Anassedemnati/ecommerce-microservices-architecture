@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basket.API", "Basket.API\Ba
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Discount.API", "Discount.API\Discount.API.csproj", "{AA7A708D-A3C9-480E-9B03-EF3430692D71}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ordering.API", "Ordering.API\Ordering.API.csproj", "{C404625D-B99A-418D-BD6D-7AE037240880}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{AA7A708D-A3C9-480E-9B03-EF3430692D71}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA7A708D-A3C9-480E-9B03-EF3430692D71}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA7A708D-A3C9-480E-9B03-EF3430692D71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C404625D-B99A-418D-BD6D-7AE037240880}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C404625D-B99A-418D-BD6D-7AE037240880}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C404625D-B99A-418D-BD6D-7AE037240880}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C404625D-B99A-418D-BD6D-7AE037240880}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
